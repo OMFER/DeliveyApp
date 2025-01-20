@@ -2,6 +2,7 @@ package com.omfer.deliveryapp.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -14,14 +15,14 @@ import com.omfer.deliveryapp.R
 
 class RegisterActivity : AppCompatActivity() {
 
-    var imageViewGoToLogin: ImageView? = null
-    var editTextName: EditText? = null
-    var editTextLastName: EditText? = null
-    var editTextPhone: EditText? = null
-    var editTextEmail: EditText? = null
-    var editTextPass: EditText? = null
-    var editTextPassConf: EditText? = null
-    var buttonReg: Button? = null
+    private var imageViewGoToLogin: ImageView? = null
+    private var editTextName: EditText? = null
+    private var editTextLastName: EditText? = null
+    private var editTextPhone: EditText? = null
+    private var editTextEmail: EditText? = null
+    private var editTextPass: EditText? = null
+    private var editTextPassConf: EditText? = null
+    private var buttonReg: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +45,7 @@ class RegisterActivity : AppCompatActivity() {
 
         buttonReg?.setOnClickListener { register() }
         imageViewGoToLogin?.setOnClickListener {
-            val i = Intent(this, RegisterActivity::class.java)
+            val i = Intent(this, MainActivity::class.java)
             startActivity(i)
         }
     }
@@ -56,12 +57,33 @@ class RegisterActivity : AppCompatActivity() {
         val pass = editTextPass?.text.toString()
         val passConf = editTextPassConf?.text.toString()
 
+        if (validate(email, pass, passConf, name, ape, phone)) {
+            Toast.makeText(this, "Registro correcto", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "Registro incorrecto", Toast.LENGTH_LONG).show()
+        }
+    }
+    private fun validate(
+        email: String,
+        pass: String,
+        passConf: String,
+        name: String,
+        ape: String,
+        phone: String
+    ): Boolean {
         if (name.isEmpty() || ape.isEmpty() || phone.isEmpty() || email.isEmpty() || pass.isEmpty() || passConf.isEmpty()) {
-            return
+            return false
+        }
+        if (!email.isEmailValid()) {
+            return false
         }
         if (pass != passConf) {
-            return
+           Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_LONG).show()
+            return false
         }
-        Toast.makeText(this, "Registro correcto", Toast.LENGTH_LONG).show()
+        return true
+    }
+    private fun String.isEmailValid(): Boolean {
+        return !TextUtils.isEmpty(this) && android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
     }
 }
