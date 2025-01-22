@@ -3,6 +3,7 @@ package com.omfer.deliveryapp.activities
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -12,8 +13,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.omfer.deliveryapp.R
+import com.omfer.deliveryapp.models.ResponseHTTP
+import com.omfer.deliveryapp.models.User
+import com.omfer.deliveryapp.providers.UsersProvider
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
+
+    val TAG = "RegisterActivity"
 
     private var imageViewGoToLogin: ImageView? = null
     private var editTextName: EditText? = null
@@ -23,6 +32,8 @@ class RegisterActivity : AppCompatActivity() {
     private var editTextPass: EditText? = null
     private var editTextPassConf: EditText? = null
     private var buttonReg: Button? = null
+
+    var usersProvider = UsersProvider()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +69,29 @@ class RegisterActivity : AppCompatActivity() {
         val passConf = editTextPassConf?.text.toString()
 
         if (validate(email, pass, passConf, name, ape, phone)) {
-            Toast.makeText(this, "Registro correcto", Toast.LENGTH_LONG).show()
+            Log.d(TAG, "$email - $pass - $passConf - $name - $ape - $phone")
+            val user = User(
+                name = name,
+                lastName = ape,
+                email = email,
+                phone = phone,
+                password = pass,
+                image = null,
+                sessionToken = null,
+                isAvailable = null
+            )
+            usersProvider.register(user)?.enqueue(object: Callback<ResponseHTTP>{
+                override fun onResponse(call: Call<ResponseHTTP>, response: Response<ResponseHTTP>) {
+                    Toast.makeText(this@RegisterActivity, response.message(), Toast.LENGTH_LONG).show()
+                    Log.d(TAG, "$response")
+                    Log.d(TAG, "Body: ${response.body()}")
+                }
+
+                override fun onFailure(call: Call<ResponseHTTP>, t: Throwable) {
+                    Log.d(TAG, "Se produjo un error ${t.message}")
+                    Toast.makeText(this@RegisterActivity, "Se produjo un error ${t.message}", Toast.LENGTH_LONG).show()
+                }
+            })
         } else {
             Toast.makeText(this, "Registro incorrecto", Toast.LENGTH_LONG).show()
         }
