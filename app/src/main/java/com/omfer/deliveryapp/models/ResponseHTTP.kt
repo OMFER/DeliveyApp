@@ -6,10 +6,10 @@ import com.google.gson.annotations.SerializedName
 class ResponseHTTP (
     @SerializedName("message") val message: String,
     @SerializedName("success") val isSuccess: Boolean,
-    @SerializedName("id") val id: JsonObject,
+    @SerializedName("data") val data: JsonObject,
     @SerializedName("error") val error: String,
 ){
     override fun toString(): String {
-        return "ResponseHTTP(message='$message', isSuccess=$isSuccess, id=$id, error='$error')"
+        return "ResponseHTTP(message='$message', isSuccess=$isSuccess, id=$data, error='$error')"
     }
 }
